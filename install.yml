@@ -92,7 +92,7 @@
 
     - name: Upgrade pip3
       shell: pip3 install --upgrade pip
-      changed: false
+      changed_when: false
 
     - name: Install python packages
       pip:
