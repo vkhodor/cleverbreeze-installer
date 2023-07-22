@@ -3,7 +3,7 @@
 1. Install Git and Ansible.
 ```
 apt-get update
-apt-get install git ansible
+apt-get install git
 ```
 
 2. Clone installer repo.
