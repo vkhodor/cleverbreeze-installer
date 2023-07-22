@@ -72,27 +72,33 @@
         enabled: true
         state: started
 
-    - name: 'Clone/Update repo'
+    - name: Clone/Update repo
       git:
         repo: '{{ repo_url }}'
-        dest: '/tmp/cleverview'
+        dest: '/root/cleverview-{{ version }}'
         clone: true
         update: true
         force: true
         accept_hostkey: true
         version: '{{ version }}'
 
+    - name: Create symlink to new directory
+      file:
+        src: '/root/cleverview-{{ version }}'
+        dest: /root/cleverview
+        mode: '0777'
+
     - name: Find all .git files
       find:
         patterns: '.git*'
-        paths: '/tmp/cleverview'
+        paths: '/root/cleverview-{{ version }}'
         recurse: true
       register: git_files
 
     - name: Find all TODO files
       find:
         patterns: 'TODO*'
-        paths: '/tmp/cleverview'
+        paths: '/root/cleverview-{{ version }}'
         recurse: true
       register: todo_files
 
@@ -100,7 +106,7 @@
     - name: Find all sqlite files
       find:
         patterns: '*.sqlite'
-        paths: '/tmp/cleverview'
+        paths: '/root/cleverview-{{ version }}'
         recurse: true
       register: sqlite_files
 
@@ -110,9 +116,9 @@
         state: absent
       with_items: '{{ git_files.files + todo_files.files + sqlite_files.files }}'
 
-    - name: Remove some files
+    - name: Remove files
       file:
-        path: '/tmp/cleverview/{{ item }}'
+        path: '/root/cleverview-{{ version }}/{{ item }}'
         state: absent
       with_items:
         - migrations
@@ -125,7 +131,7 @@
 
     - name: Install python packages
       pip:
-        requirements: /tmp/cleverview/requirements.txt
+        requirements: '/root/cleverview-{{ version }}/requirements.txt'
 
     - name: 'Configure Nginx'
       block:
@@ -164,21 +170,26 @@
             enabled: true
             state: restarted
 
-#    - name: 'Configure WebGUI Service'
-#      block:
-#        - name: 'copy unit file'
-#          copy:
-#            src: webgui.service
-#            dest: /etc/systemd/system/webgui.service
-#
-#        - name: 'enable webgui service'
-#          shell: systemctl enable webgui
-#
-#        - name: 'start webgui service'
-#          service:
-#            name: webgui
-#            state: restarted
-#
+    - name: 'Configure CleverView UI Service'
+      block:
+        - name: Copy uwsgi.ini
+          src: files/uwsgi.ini
+          dest: '/root/cleverview-{{ version }}/system/uwsgi.ini'
+          mode: '0664'
+
+        - name: Copy unit file
+          copy:
+            src: files/cleverview-ui.service
+            dest: /etc/systemd/system/cleverview-ui.service
+            mode: '0644'
+
+        - name: Enable CleverView service
+          systemd:
+            name: cleverview-ui
+            enabled: true
+            daemon_reload: true
+            state: restarted
+
 #    - name: Configure modbus-client
 #      block:
 #        - name: copy unit

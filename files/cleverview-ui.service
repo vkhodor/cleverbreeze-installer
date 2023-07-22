@@ -1,0 +1,14 @@
+[Unit]
+Description=CleverView UI Service
+
+[Service]
+ExecStart= /usr/bin/env uwsgi --ini /root/cleverview/system/uwsgi.ini
+Restart=always
+KillSignal=SIGTERM
+Type=notify
+NotifyAccess=all
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+/root/cleverview/cleverview-ui/cleverview-ui.log {
+    maxsize 50M
+    hourly
+    missingok
+    rotate 20
+    compress
+    notifempty
+    nocreate
+    postrotate
+            for pid in $(pidof uwsgi); do kill -HUP $pid; done
+    endscript
+}
