@@ -1,10 +1,6 @@
 ---
-- hosts: all
-  become: true
-  vars:
-#    repo_url: 'ssh://hvv@192.168.2.35/home/hvv/devel/snmpagg'
-    repo_url: 'git@bitbucket.org:vkhodor/snmpagg.git'
-
+- hosts: localhost
+  
   tasks:
     - name: Create .ssh directory
       file:
