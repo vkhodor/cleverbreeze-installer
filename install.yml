@@ -191,58 +191,39 @@
             daemon_reload: true
             state: restarted
 
-#    - name: Configure modbus-client
-#      block:
-#        - name: copy unit
-#          copy:
-#            src: modbus-client.service
-#            dest: /etc/systemd/system/modbus-client.service
-#
-#        - name: reload systemd units
-#          shell: systemctl daemon-reload
-#
-#        - name: enable modbus-client.service
-#          shell: systemctl enable modbus-client
-#
-#        - name: start modbus-client
-#          service:
-#            name: modbus-client
-#            state: restarted
-#
-#    - name: 'Configure modbus-connector Service'
-#      block:
-#        - name: 'disable modbus-connector'
-#          shell: update-rc.d modbus-connector disable || exit 0
-#
-#        - name: 'remove old modbus-connector start script'
-#          file:
-#            path: /etc/init.d/modbus-connector
-#            state: absent
-#
-#        - name: 'remove cronjob for data-cleaner.py'
-#          cron:
-#            name: 'data-cleaner job'
-#            job: 'cd /root/snmpagg/modbus-connector/; ./data-cleaner.py > /tmp/data-clear.log'
-#            state: absent
-#
-#    - name: 'Sync FS'
-#      shell: sync
-#
-#    - name: 'Add cronjob real time clock syncronization every week'
-#      cron:
-#        name: 'real time clock syncronization every week'
-#        job: '/sbin/hwclock -s'
-#        hour: '1'
-#        minute: '2'
-#        weekday: '1'
-#
-#    - name: Add Debian-snmp to root group
-#      user:
-#        name: 'Debian-snmp'
-#        groups: 'root'
-#        append: yes
-#
-#    - name: Add group permisions
-#      file:
-#        path: '/root'
-#        mode: 0755
+    - name: Configure cleverview-modbus
+      block:
+        - name: Copy unit
+          copy:
+            src: /files/cleverview-modbus.service
+            dest: /etc/systemd/system/cleverview-modbus.service
+
+        - name: Enable cleverview-modbus
+          systemd:
+            name: cleverview-modbus
+            enabled: true
+            daemon_reload: true
+            state: restarted
+
+    - name: Sync FS
+      shell: sync
+      changed_when: false
+
+    - name: Add cronjob real time clock syncronization every week
+      cron:
+        name: real time clock syncronization every week
+        job: /sbin/hwclock -s
+        hour: '1'
+        minute: '2'
+        weekday: '1'
+
+    - name: Add Debian-snmp to root group
+      user:
+        name: 'Debian-snmp'
+        groups: 'root'
+        append: yes
+
+    - name: Add group permisions
+      file:
+        path: '/root'
+        mode: 0755
