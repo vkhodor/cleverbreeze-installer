@@ -87,6 +87,7 @@
         src: '/root/cleverview-{{ version }}'
         dest: /root/cleverview
         mode: '0777'
+        state: link
 
     - name: Find all .git files
       find:
