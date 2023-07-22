@@ -21,7 +21,7 @@ apt-get install ansible -y
 
 echo "[INFO] Turning SNMPAgg off"
 ansible-playbook ./10_turn_snmpagg_off.yml
-echo "[INFO] Install CleverView"
+echo "[INFO] Install CleverView ${version}"
 ansible-playbook ./install.yml --ask-vault-pass --extra-vars "version=${version}"
 
 

@@ -22,7 +22,7 @@
         dest: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
         mode: '0644'
 
-    - name: 'Install required software.'
+    - name: 'Install required software'
       apt:
         name:
           - dhcpcd5
@@ -52,46 +52,89 @@
         update: true
         accept_hostkey: true
         version: '{{ version }}'
-#
-#    - name: 'pip -r /root/snmpagg/requirements.txt'
-#      shell: pip3 install -r /root/snmpagg/requirements.txt
-#
-#    - name: 'Configure Nginx'
-#      block:
-#        - name: 'copy nginx.conf'
-#          copy:
-#            src: nginx.conf
-#            dest: /etc/nginx/nginx.conf
-#            owner: root
-#            group: root
-#            mode: '0644'
-#
-#        - name: 'copy webgui.conf'
-#          copy:
-#            src: webgui.conf
-#            dest: /etc/nginx/sites-available/webgui.conf
-#
-#        - name: 'remove default site'
-#          file:
-#            path: '/etc/nginx/sites-enabled/default'
-#            state: absent
-#
-#        - name: 'mkdir /run/uwsgi'
-#          file:
-#            path: /run/uwsgi
-#            state: directory
-#
-#        - name: 'enable webgui site'
-#          file:
-#            src: /etc/nginx/sites-available/webgui.conf
-#            dest: /etc/nginx/sites-enabled/webgui.conf
-#            state: link
-#
-#        - name: 'restart nginx'
-#          service:
-#            name: nginx
-#            state: restarted
-#
+
+    - name: Find all .git files
+      find:
+        patterns: '.git*'
+        paths: '/tmp/cleverview'
+        recurse: true
+      register: git_files
+
+    - name: Find all TODO files
+      find:
+        patterns: 'TODO*'
+        paths: '/tmp/cleverview'
+        recurse: true
+      register: todo_files
+
+
+    - name: Find all sqlite files
+      find:
+        patterns: '*.sqlite'
+        paths: '/tmp/cleverview'
+        recurse: true
+      register: sqlite_files
+
+    - name: Remove all found files
+      file:
+        path: '{{ item }}'
+        state: absent
+      with_items: '{{ git_files.files + todo_files.files + sqlite_files.files }}'
+
+    - name: Remove some files
+      file:
+        path: '/tmp/cleverview/{{ item }}'
+        state: absent
+      with_items:
+        - migrations
+        - update.sh
+        - deploy
+
+    - name: Upgrade pip3
+      shell: pip3 install --upgrade pip
+      changed: false
+
+    - name: Install python packages
+      pip:
+        requirements: /tmp/cleverview/requirements.txt
+
+    - name: 'Configure Nginx'
+      block:
+        - name: Copy nginx.conf
+          copy:
+            src: files/nginx.conf
+            dest: /etc/nginx/nginx.conf
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Copy cleverview-ui.conf
+          copy:
+            src: files/cleverview-ui.conf
+            dest: /etc/nginx/sites-available/cleverview-ui.conf
+
+        - name: Remove default site
+          file:
+            path: /etc/nginx/sites-enabled/default
+            state: absent
+
+        - name: Create /run/uwsgi directory
+          file:
+            path: /run/uwsgi
+            state: directory
+
+        - name: Enable cleverview-ui site
+          file:
+            src: /etc/nginx/sites-available/cleverview-ui.conf
+            dest: /etc/nginx/sites-enabled/cleverview-ui.conf
+            state: link
+
+        - name: Restart and enable nginx
+          systemd:
+            name: nginx
+            enabled: true
+            state: restarted
+
 #    - name: 'Configure WebGUI Service'
 #      block:
 #        - name: 'copy unit file'
