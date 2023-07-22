@@ -1,0 +1,154 @@
+---
+- hosts: all
+  become: true
+  vars:
+#    repo_url: 'ssh://hvv@192.168.2.35/home/hvv/devel/snmpagg'
+    repo_url: 'git@bitbucket.org:vkhodor/snmpagg.git'
+
+  tasks:
+    - name: 'ssh keygen'
+      shell: test -e /root/.ssh/id_rsa || ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -C "" -N ""
+
+    - name: 'Upgrade all packages'
+      apt:
+        name: '*'
+        state: latest
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: 'Install required software.'
+      apt:
+        name:
+          - dhcpcd5
+          - chrony
+          - nginx
+          - uwsgi
+          - python3
+          - python3-pip
+          - git
+          - sqlite3
+          - vim
+          - snmpd
+        state: present
+        force_apt_get: yes
+
+    - name: 'Enable SNMPd'
+      shell: systemctl enable snmpd
+
+    - name: 'Clone/Update repo'
+      git:
+        repo: '{{ repo_url }}'
+        dest: '/root/snmpagg'
+        force: yes
+        accept_hostkey: yes
+#        version: '{{ repo_version }}'
+
+    - name: 'pip -r /root/snmpagg/requirements.txt'
+      shell: pip3 install -r /root/snmpagg/requirements.txt
+
+    - name: 'Configure Nginx'
+      block:
+        - name: 'copy nginx.conf'
+          copy:
+            src: nginx.conf
+            dest: /etc/nginx/nginx.conf
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: 'copy webgui.conf'
+          copy:
+            src: webgui.conf
+            dest: /etc/nginx/sites-available/webgui.conf
+
+        - name: 'remove default site'
+          file:
+            path: '/etc/nginx/sites-enabled/default'
+            state: absent
+
+        - name: 'mkdir /run/uwsgi'
+          file:
+            path: /run/uwsgi
+            state: directory
+
+        - name: 'enable webgui site'
+          file:
+            src: /etc/nginx/sites-available/webgui.conf
+            dest: /etc/nginx/sites-enabled/webgui.conf
+            state: link
+
+        - name: 'restart nginx'
+          service:
+            name: nginx
+            state: restarted
+
+    - name: 'Configure WebGUI Service'
+      block:
+        - name: 'copy unit file'
+          copy:
+            src: webgui.service
+            dest: /etc/systemd/system/webgui.service
+
+        - name: 'enable webgui service'
+          shell: systemctl enable webgui
+
+        - name: 'start webgui service'
+          service:
+            name: webgui
+            state: restarted
+
+    - name: Configure modbus-client
+      block:
+        - name: copy unit
+          copy:
+            src: modbus-client.service
+            dest: /etc/systemd/system/modbus-client.service
+
+        - name: reload systemd units
+          shell: systemctl daemon-reload
+
+        - name: enable modbus-client.service
+          shell: systemctl enable modbus-client
+
+        - name: start modbus-client
+          service:
+            name: modbus-client
+            state: restarted
+
+    - name: 'Configure modbus-connector Service'
+      block:
+        - name: 'disable modbus-connector'
+          shell: update-rc.d modbus-connector disable || exit 0
+
+        - name: 'remove old modbus-connector start script'
+          file:
+            path: /etc/init.d/modbus-connector
+            state: absent
+
+        - name: 'remove cronjob for data-cleaner.py'
+          cron:
+            name: 'data-cleaner job'
+            job: 'cd /root/snmpagg/modbus-connector/; ./data-cleaner.py > /tmp/data-clear.log'
+            state: absent
+
+    - name: 'Sync FS'
+      shell: sync
+
+    - name: 'Add cronjob real time clock syncronization every week'
+      cron:
+        name: 'real time clock syncronization every week'
+        job: '/sbin/hwclock -s'
+        hour: '1'
+        minute: '2'
+        weekday: '1'
+
+    - name: Add Debian-snmp to root group
+      user:
+        name: 'Debian-snmp'
+        groups: 'root'
+        append: yes
+
+    - name: Add group permisions
+      file:
+        path: '/root'
+        mode: 0755

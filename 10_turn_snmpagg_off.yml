@@ -1,0 +1,33 @@
+---
+- hosts: localhost
+
+  tasks:
+    - name: Modbus Connecter / Client  block
+      block:
+        - name: Disable modbus-connector
+          shell: update-rc.d modbus-connector disable || exit 0
+
+        - name: Remove old modbus-connector start script
+          file:
+            path: /etc/init.d/modbus-connector
+            state: absent
+
+        - name: Remove cronjob for data-cleaner.py
+          cron:
+            name: data-cleaner job
+            job: 'cd /root/snmpagg/modbus-connector/; ./data-cleaner.py > /tmp/data-clear.log'
+            state: absent
+
+        - name: Disable modbus-client
+          shell: systemctl disable modbus-client || exit 0
+
+        - name: Stop modbus-client
+          shell: systemctl stop modbus-client || exit 0
+
+    - name: WebGUI block
+      block:
+        - name: Disable webgui service
+          systemd:
+            name: webgui
+            enabled: false
+            state: stopped
