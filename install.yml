@@ -195,7 +195,7 @@
       block:
         - name: Copy unit
           copy:
-            src: /files/cleverview-modbus.service
+            src: files/cleverview-modbus.service
             dest: /etc/systemd/system/cleverview-modbus.service
 
         - name: Enable cleverview-modbus
