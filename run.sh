@@ -1,11 +1,27 @@
 #! /bin/bash
 
+function usage {
+  echo "$0 <%y.%m.%d>"
+  echo "Example:"
+  echo "         $0 23.07.21"
+  exit $1
+}
+
+if [ -z "$1" ]; then
+  usage 1
+fi
+
+version="$1"
+
+
 # install ansible
 echo "[INFO] Installing Ansible and deps"
 apt-get update
 apt-get install ansible -y
+
 echo "[INFO] Turning SNMPAgg off"
 ansible-playbook ./10_turn_snmpagg_off.yml
-ansible-playbook ./install.yml --ask-vault-pass
+echo "[INFO] Install CleverView"
+ansible-playbook ./install.yml --ask-vault-pass --extra-vars "version=${version}"
 
 
