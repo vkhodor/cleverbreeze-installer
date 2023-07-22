@@ -102,7 +102,6 @@
         recurse: true
       register: todo_files
 
-
     - name: Find all sqlite files
       find:
         patterns: '*.sqlite'
@@ -173,9 +172,10 @@
     - name: 'Configure CleverView UI Service'
       block:
         - name: Copy uwsgi.ini
-          src: files/uwsgi.ini
-          dest: '/root/cleverview-{{ version }}/system/uwsgi.ini'
-          mode: '0664'
+          copy:
+            src: files/uwsgi.ini
+            dest: '/root/cleverview-{{ version }}/system/uwsgi.ini'
+            mode: '0664'
 
         - name: Copy unit file
           copy:
