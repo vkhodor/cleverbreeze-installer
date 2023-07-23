@@ -1,6 +1,6 @@
 # cleverview-installer
 
-1. Install Git and Ansible.
+1. Install Git.
 ```
 apt-get update
 apt-get install git
@@ -14,5 +14,9 @@ git clone git@github.com:vkhodor/cleverview-installer.git
 3. Run installer
 ```
 cd ./cleverview-installer
-run.sh
+./run.sh
+```
+4. Run data migration script if needs.
+```
+./migrate-from-snmpagg.sh /root/snmpagg/webgui /root/cleverview/cleverview-ui
 ```
