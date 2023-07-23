@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   vars:
-    repo_url: git@github.com:vkhodor/cleverview.git
+    repo_url: git@github.com:vkhodor/cleverbreeze.git
 
   tasks:
     - name: Turn off old services
@@ -75,7 +75,7 @@
     - name: Clone/Update repo
       git:
         repo: '{{ repo_url }}'
-        dest: '/root/cleverview-{{ version }}'
+        dest: '/root/cleverbreeze-{{ version }}'
         clone: true
         update: true
         force: true
@@ -84,29 +84,29 @@
 
     - name: Create symlink to new directory
       file:
-        src: '/root/cleverview-{{ version }}'
-        dest: /root/cleverview
+        src: '/root/cleverbreeze-{{ version }}'
+        dest: /root/cleverbreeze
         mode: '0777'
         state: link
 
     - name: Find all .git files
       find:
         patterns: '.git*'
-        paths: '/root/cleverview-{{ version }}'
+        paths: '/root/cleverbreeze-{{ version }}'
         recurse: true
       register: git_files
 
     - name: Find all TODO files
       find:
         patterns: 'TODO*'
-        paths: '/root/cleverview-{{ version }}'
+        paths: '/root/cleverbreeze-{{ version }}'
         recurse: true
       register: todo_files
 
     - name: Find all sqlite files
       find:
         patterns: '*.sqlite'
-        paths: '/root/cleverview-{{ version }}'
+        paths: '/root/cleverbreeze-{{ version }}'
         recurse: true
       register: sqlite_files
 
@@ -118,7 +118,7 @@
 
     - name: Remove files
       file:
-        path: '/root/cleverview-{{ version }}/{{ item }}'
+        path: '/root/cleverbreeze-{{ version }}/{{ item }}'
         state: absent
       with_items:
         - migrations
@@ -131,7 +131,7 @@
 
     - name: Install python packages
       pip:
-        requirements: '/root/cleverview-{{ version }}/requirements.txt'
+        requirements: '/root/cleverbreeze-{{ version }}/requirements.txt'
 
     - name: 'Configure Nginx'
       block:
@@ -143,10 +143,10 @@
             group: root
             mode: '0644'
 
-        - name: Copy cleverview-ui.conf
+        - name: Copy cleverbreeze-ui.conf
           copy:
-            src: files/cleverview-ui.conf
-            dest: /etc/nginx/sites-available/cleverview-ui.conf
+            src: files/cleverbreeze-ui.conf
+            dest: /etc/nginx/sites-available/cleverbreeze-ui.conf
 
         - name: Remove default site
           file:
@@ -158,10 +158,10 @@
             path: /run/uwsgi
             state: directory
 
-        - name: Enable cleverview-ui site
+        - name: Enable cleverbreeze-ui site
           file:
-            src: /etc/nginx/sites-available/cleverview-ui.conf
-            dest: /etc/nginx/sites-enabled/cleverview-ui.conf
+            src: /etc/nginx/sites-available/cleverbreeze-ui.conf
+            dest: /etc/nginx/sites-enabled/cleverbreeze-ui.conf
             state: link
 
         - name: Restart and enable nginx
@@ -170,37 +170,37 @@
             enabled: true
             state: restarted
 
-    - name: 'Configure CleverView UI Service'
+    - name: 'Configure Clever Breeze UI Service'
       block:
         - name: Copy uwsgi.ini
           copy:
             src: files/uwsgi.ini
-            dest: '/root/cleverview-{{ version }}/system/uwsgi.ini'
+            dest: '/root/cleverbreeze-{{ version }}/system/uwsgi.ini'
             mode: '0664'
 
         - name: Copy unit file
           copy:
-            src: files/cleverview-ui.service
-            dest: /etc/systemd/system/cleverview-ui.service
+            src: files/cleverbreeze-ui.service
+            dest: /etc/systemd/system/cleverbreeze-ui.service
             mode: '0644'
 
-        - name: Enable CleverView service
+        - name: Enable Clever Breeze UI service
           systemd:
-            name: cleverview-ui
+            name: cleverbreeze-ui
             enabled: true
             daemon_reload: true
             state: restarted
 
-    - name: Configure cleverview-modbus
+    - name: Configure cleverbreeze-modbus
       block:
         - name: Copy unit
           copy:
-            src: files/cleverview-modbus.service
-            dest: /etc/systemd/system/cleverview-modbus.service
+            src: files/cleverbreeze-modbus.service
+            dest: /etc/systemd/system/cleverbreeze-modbus.service
 
-        - name: Enable cleverview-modbus
+        - name: Enable cleverbreeze-modbus
           systemd:
-            name: cleverview-modbus
+            name: cleverbreeze-modbus
             enabled: true
             daemon_reload: true
             state: restarted

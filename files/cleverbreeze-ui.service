@@ -1,8 +1,8 @@
 [Unit]
-Description=CleverView UI Service
+Description=Clever Breeze UI Service
 
 [Service]
-ExecStart= /usr/bin/env uwsgi --ini /root/cleverview/system/uwsgi.ini
+ExecStart= /usr/bin/env uwsgi --ini /root/cleverbreeze/system/uwsgi.ini
 Restart=always
 KillSignal=SIGTERM
 Type=notify

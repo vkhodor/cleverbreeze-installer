@@ -1,13 +1,13 @@
 [Unit]
-Description=CleverView Modbus Service
+Description=Clever Breeze Modbus Service
 After=network.target
 
 [Service]
 Type=simple
 Environment=MODBUS_CLIENT_LOGLEVEL=INFO
 Environment=MODBUS_CLIENT_DELETE_DATA_OLDER_THAN=365
-WorkingDirectory=/root/cleverview/cleverview-modbus/
-ExecStart=/root/cleverview/cleverview-modbus/cleverview-modbus.py
+WorkingDirectory=/root/cleverbreeze/cleverbreeze-modbus/
+ExecStart=/root/cleverbreeze/cleverbreeze-modbus/cleverbreeze-modbus.py
 KillSignal=SIGTERM
 NotifyAccess=all
 User=root

@@ -3,7 +3,7 @@
 function usage {
   echo "$0 <src-directory> <dest-directory>"
   echo "Example:"
-  echo "         $0 /root/snmpagg/webgui /root/cleverview/cleverview-ui"
+  echo "         $0 /root/snmpagg/webgui /root/cleverbreeze/cleverbreeze-ui"
   exit $1
 }
 
@@ -14,7 +14,7 @@ fi
 if [ -z "$2" ]; then
   usage 2
 fi
-migration_script_directory="../cleverview/tools/"
+migration_script_directory="../cleverbreeze/tools/"
 if [ ! -z "$3" ]; then
   migration_script_directory="${3}"
 fi
