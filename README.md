@@ -1,5 +1,10 @@
 # cleverbreeze-installer
 
+0. If /root/.ssh/id_rsa not exists generate it with default values (just type Enter on any prompt).
+```
+ssh-keygen
+```
+
 1. Install Git.
 ```
 apt-get update
