@@ -8,7 +8,7 @@ apt-get install git
 
 2. Clone installer repo.
 ```
-git clone git clone https://github.com/vkhodor/cleverbreeze-installer.git
+git clone https://github.com/vkhodor/cleverbreeze-installer.git
 ```
 
 3. Run installer
