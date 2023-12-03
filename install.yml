@@ -82,13 +82,6 @@
         accept_hostkey: true
         version: '{{ version }}'
 
-    - name: Create symlink to new directory
-      file:
-        src: '/root/cleverbreeze-{{ version }}'
-        dest: /root/cleverbreeze
-        mode: '0777'
-        state: link
-
     - name: Find all .git files
       find:
         patterns: '.git*'
@@ -132,6 +125,13 @@
     - name: Install python packages
       pip:
         requirements: '/root/cleverbreeze-{{ version }}/requirements.txt'
+
+    - name: Create symlink to new directory
+      file:
+        src: '/root/cleverbreeze-{{ version }}'
+        dest: /root/cleverbreeze
+        mode: '0777'
+        state: link
 
     - name: 'Configure Nginx'
       block:
@@ -227,3 +227,9 @@
       file:
         path: '/root'
         mode: 0755
+
+    - name: Measage abount next steps
+      debug:
+        msg: |
+          If this is not new instalation you need to run data migration script
+          Also you need to regenerate snmpd (from UI) and resboot the system.
