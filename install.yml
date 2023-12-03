@@ -232,4 +232,4 @@
       debug:
         msg: |
           If this is not new instalation you need to run data migration script
-          Also you need to regenerate snmpd (from UI) and resboot the system.
+          Also you need to regenerate snmpd (from UI) and reboot the system.
