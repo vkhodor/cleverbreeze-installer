@@ -1,12 +1,17 @@
 # cleverbreeze-installer
-
-1. Install Git.
+1. Install OS https://www.raspberrypi.com/documentation/computers/getting-started.html#raspberry-pi-imager
+   1. 64-bit Lite (not Desktop)
+   2. With Turned On SSH
+   3. With Password
+2. nmap -sP 192.168.2.0/24 and find the ip
+3. ssh to raspberry
+4. Install Git.
 ```
 apt-get update
 apt-get install git
 ```
 
-2. Clone installer repo.
+5. Clone installer repo.
 ```
 git clone https://github.com/vkhodor/cleverbreeze-installer.git
 ```

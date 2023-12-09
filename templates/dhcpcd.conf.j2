@@ -1,7 +1,6 @@
 # --- DHCPCD STATIC IP CONF ---
 interface eth0
-static ip_address=192.168.2.123/24 {{ cleverbreeze_ip_address }}
-static routers=192.168.2.1          {{ cleverbreeze_routers }}
-static domain_name_servers=8.8.8.8 1.1.1.1 {{ cleverbreeze_domain_name_servers }}
+static ip_address={{ cleverbreeze_ip_address }}
+static routers={{ cleverbreeze_routers }}
+static domain_name_servers={{ cleverbreeze_domain_name_servers }}
 # --- EOF ---
-
