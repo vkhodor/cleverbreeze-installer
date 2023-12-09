@@ -1,0 +1,43 @@
+---
+- hosts: localhost
+
+  become: true
+
+  vars:
+    cleverbreeze_ip_address: 192.168.2.123/24
+    cleverbreeze_routers: 192.168.2.1
+    cleverbreeze_domain_name_servers: '8.8.8.8 1.1.1.1'
+
+  tasks:
+    - name: Upgrade Packages
+      apt:
+        name: '*'
+        state: latest
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Remove NetworkManager
+      apt:
+        name: network-manager
+        state: absent
+
+    - name: Install dhcpcd
+      apt:
+        name: dhcpcd
+        state: present
+        autoremove: true
+
+    - name: Configure dhcpcd
+      template:
+        src: dhcpcd.conf.j2
+        dest: /etc/dhcpcd.conf
+
+    - name: Enable dhcpcd
+      systemd:
+        name: dhcpcd
+        enabled: true
+
+    - name: Enable sshd
+      systemd:
+        name: ssh
+        enabled: true
