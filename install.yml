@@ -118,9 +118,20 @@
         - update.sh
         - deploy
 
-#    - name: Upgrade pip3
-#      shell: pip3 install --upgrade pip
-#      changed_when: false
+    - name: Create pip config dir
+      file:
+        path: /root/.config/pip
+        state: directory
+        mode: '0755'
+
+    - name: Configure pip
+      template:
+        src: pip.conf.j2
+        dest: /root/.config/pip/pip.conf
+
+    - name: Upgrade pip3
+      shell: pip3 install --upgrade pip
+      changed_when: false
 
     - name: Install python packages
       pip:
