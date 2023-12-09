@@ -118,9 +118,9 @@
         - update.sh
         - deploy
 
-    - name: Upgrade pip3
-      shell: pip3 install --upgrade pip
-      changed_when: false
+#    - name: Upgrade pip3
+#      shell: pip3 install --upgrade pip
+#      changed_when: false
 
     - name: Install python packages
       pip:
