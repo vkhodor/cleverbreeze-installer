@@ -11,6 +11,13 @@ apt-get install git
 git clone https://github.com/vkhodor/cleverbreeze-installer.git
 ```
 
+4. Prepare OS (if it is the first time installation)
+```
+apt-get update
+apt-get install ansible -y
+ansible-playbook ./prepare_os.yml
+```
+
 3. Run installer
 ```
 cd ./cleverbreeze-installer
