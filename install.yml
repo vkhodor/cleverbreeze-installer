@@ -117,7 +117,8 @@
         - migrations
         - update.sh
         - deploy
-
+    # TODO: will change to native debian packages system or use python venv
+    # https://stackoverflow.com/questions/75608323/how-do-i-solve-error-externally-managed-environment-every-time-i-use-pip-3
     - name: Create pip config dir
       file:
         path: /root/.config/pip
