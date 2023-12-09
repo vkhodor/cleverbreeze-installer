@@ -27,10 +27,10 @@
           shell: systemctl stop modbus-client || exit 0
 
         - name: Disable webgui service
-          systemd:
-            name: webgui
-            enabled: false
-            state: stopped
+          shell: systemctl disable webgui || exit 0
+
+        - name: Stop webgui service
+          shell: systemctl stop webgui || exit 0
 
     - name: Create .ssh directory
       file:
