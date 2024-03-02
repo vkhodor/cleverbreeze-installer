@@ -2,6 +2,8 @@
 Description=Clever Breeze UI Service
 
 [Service]
+Environment=DATABASE_URL=sqlite:////root/cleverbreeze/cleverbreeze-ui/snmpusersdb.sqlite
+ExecStartPre=-/root/celverbreeze/cleverbreeze-snmp-v3-configurator/snmp-v3-configurator.py
 ExecStart= /usr/bin/env uwsgi --ini /root/cleverbreeze/system/uwsgi.ini
 Restart=always
 KillSignal=SIGTERM
