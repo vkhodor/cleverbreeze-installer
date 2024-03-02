@@ -63,6 +63,11 @@
           - sqlite3
           - vim
           - snmpd
+#          - build-essential
+#          - libdbus-glib-1-dev
+#          - libgirepository1.0-dev
+#          - pkg-config
+#          - cmake
         state: present
         force_apt_get: yes
 
