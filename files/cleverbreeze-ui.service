@@ -2,7 +2,7 @@
 Description=Clever Breeze UI Service
 
 [Service]
-Environment=WORK_DIRECTORY=/root/cleverbreeze
+Environment=TEMPLATES_DIRECTORY=/root/cleverbreeze
 Environment=DATABASE_URL=sqlite:////root/cleverbreeze/cleverbreeze-ui/snmpusersdb.sqlite
 Environment=CLEVERBREEZE_SNMP_CONFIG=/root/cleverbreeze/cleverbreeze-ui/netcfg/snmpd.conf.json
 ExecStartPre=-/root/cleverbreeze/cleverbreeze-snmp-v3-configurator/snmp-v3-configurator.py
