@@ -254,13 +254,15 @@
       block:
         - name: Check database
           shell: alembic check
-          chdir: /root/cleverbreeze/cleverbreeze-ui/
+          args:
+            chdir: /root/cleverbreeze/cleverbreeze-ui/
           changed_when: false
           failed_when: false
           register: alembic_check
 
         - name: Upgrade database
           shell: alembic upgrade head
-          chdir: /root/cleverbreeze/cleverbreeze-ui/
+          args:
+            chdir: /root/cleverbreeze/cleverbreeze-ui/
           changed_when: true
           when: alembic_check.rc != 0
