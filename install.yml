@@ -142,6 +142,10 @@
       pip:
         requirements: '/root/cleverbreeze-{{ version }}/requirements.txt'
 
+    - name: Get old version by old link
+      set_fact:
+        old_version: '{{ "/root/cleverbreeze" | realpath }}'
+
     - name: Create symlink to new directory
       file:
         src: '/root/cleverbreeze-{{ version }}'
@@ -185,6 +189,34 @@
             name: nginx
             enabled: true
             state: restarted
+
+    - name: Copy old databases
+      copy:
+        src: '{{ old_version }}/{{ item }}'
+        dest: '/root/cleverbreeze/{{ item }}'
+        remote_src: true
+      with_items:
+        - cleverbreeze-ui/controllers.sqlite
+        - cleverbreeze-ui/datadb.sqlite
+        - cleverbreeze-ui/snmpusersdb.sqlite
+      ignore_errors: true
+
+    - name: Alembic migrations
+      block:
+        - name: Check database
+          shell: alembic check
+          args:
+            chdir: /root/cleverbreeze/cleverbreeze-ui/
+          changed_when: false
+          failed_when: false
+          register: alembic_check
+
+        - name: Upgrade database
+          shell: alembic upgrade head
+          args:
+            chdir: /root/cleverbreeze/cleverbreeze-ui/
+          changed_when: true
+          when: alembic_check.rc != 0
 
     - name: 'Configure Clever Breeze UI Service'
       block:
@@ -249,20 +281,3 @@
 #        msg: |
 #          If this is not new instalation you need to run data migration script
 #          Also you need to regenerate snmpd (from UI) and reboot the system.
-
-    - name: Alembic migrations
-      block:
-        - name: Check database
-          shell: alembic check
-          args:
-            chdir: /root/cleverbreeze/cleverbreeze-ui/
-          changed_when: false
-          failed_when: false
-          register: alembic_check
-
-        - name: Upgrade database
-          shell: alembic upgrade head
-          args:
-            chdir: /root/cleverbreeze/cleverbreeze-ui/
-          changed_when: true
-          when: alembic_check.rc != 0
