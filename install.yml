@@ -190,7 +190,7 @@
             enabled: true
             state: restarted
 
-    - name: Copy old databases
+    - name: Copy old data and configuration
       copy:
         src: '{{ old_version }}/{{ item }}'
         dest: '/root/cleverbreeze/{{ item }}'
@@ -199,6 +199,8 @@
         - cleverbreeze-ui/controllers.sqlite
         - cleverbreeze-ui/datadb.sqlite
         - cleverbreeze-ui/snmpusersdb.sqlite
+        - cleverbreeze-ui/netcfg/snmpd.conf.json
+        - cleverbreeze-ui/netcfg/dhcp.conf.json
       ignore_errors: true
 
     - name: Alembic migrations
